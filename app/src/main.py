@@ -59,7 +59,6 @@ detector = AmbulanceDetection(args)
 detector.loadModel()
 outputFrame = None
 lock = threading.Lock()
-# initialize a flask object
 app = Flask(__name__)
 
 def run(detector):
@@ -127,16 +126,11 @@ def generate():
 				# check if the output frame is available, otherwise skip
 				# the iteration of the loop
 			if outputFrame is None:
-				#print("isnone")
 				continue
 			# encode the frame in JPEG format
-
-			
 			(flag, encodedImage) = cv2.imencode(".jpg", outputFrame)
 			
-			# ensure the frame was successfully encoded
 			if not flag:
-				print("Not Encoded")
 				continue
 		# yield the output frame in the byte format
 		yield(b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + 
@@ -145,19 +139,17 @@ def generate():
 			
 @app.route("/video_feed")
 def video_feed():
-	# return the response generated along with the specific media
-	# type (mime type)
+	
 	return Response(generate(),
 		mimetype = "multipart/x-mixed-replace; boundary=frame")
 	 
-		
+
 if __name__ == '__main__':
 	
-	# start a thread that will perform motion detection
+	# start a thread that will run the object detector
 	t = threading.Thread(target=run, args=(detector,))
 	t.daemon = True
 	t.start()
-	print(outputFrame)
 	# start the flask app
 	app.run(host="0.0.0.0", port=5000, debug=True,
 		threaded=True, use_reloader=False)
