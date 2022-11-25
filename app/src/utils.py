@@ -37,6 +37,7 @@ def visualize(
   Returns:
     Image with bounding boxes.
   """
+  category_name=''
   for detection in detection_result.detections:
     # Draw bounding_box
     bbox = detection.bounding_box

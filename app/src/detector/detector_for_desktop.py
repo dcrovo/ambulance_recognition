@@ -18,7 +18,8 @@ class AmbulanceDetection():
         self.frameHeigth = args.frameHeight
         self.numThreads = int(args.numThreads)
         self.enableEdgeTPU = bool(args.enableEdgeTPU)
-    
+        self.detections =[]
+
     def run(self):
         # Variables to calculate FPS
         counter, fps = 0, 0
@@ -65,7 +66,7 @@ class AmbulanceDetection():
 
             # Run object detection estimation using the model.
             detection_result = detector.detect(input_tensor)
-
+            self.detections = detection_result.detections
             # Draw keypoints and edges on input image
             image = utils.visualize(image, detection_result)
 
@@ -82,53 +83,12 @@ class AmbulanceDetection():
                         font_size, text_color, font_thickness)
 
             #Stop the program if the ESC key is pressed.
+            print(self.detections)
             if cv2.waitKey(1) == 27:
                 break
             cv2.imshow('object_detector', image)
-        
+           
 
         cap.release()
         cv2.destroyAllWindows()
-             
-
-def parse():
             
-    parser = argparse.ArgumentParser(
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument(
-        '--model',
-        help='Path of the object detection model.',
-        required=False,
-        default='efficientdet_lite0.tflite')
-    parser.add_argument(
-        '--cameraId', help='Id of camera.', required=False, type=int, default=0)
-    parser.add_argument(
-        '--frameWidth',
-        help='Width of frame to capture from camera.',
-        required=False,
-        type=int,
-        default=640)
-    parser.add_argument(
-        '--frameHeight',
-        help='Height of frame to capture from camera.',
-        required=False,
-        type=int,
-        default=480)
-    parser.add_argument(
-        '--numThreads',
-        help='Number of CPU threads to run the model.',
-        required=False,
-        type=int,
-        default=4)
-    parser.add_argument(
-        '--enableEdgeTPU',
-        help='Whether to run the model on EdgeTPU.',
-        action='store_true',
-        required=False,
-        default=False)
-    args = parser.parse_args()
-    
-    #detector = AmbulanceDetection(args)
-    #detector.run()
-    
-#main()
