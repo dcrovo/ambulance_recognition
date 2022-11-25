@@ -82,13 +82,13 @@ class AmbulanceDetection():
                         font_size, text_color, font_thickness)
 
             #Stop the program if the ESC key is pressed.
-            #if cv2.waitKey(1) == 27:
-            #    break
-            #cv2.imshow('object_detector', image)
+            if cv2.waitKey(1) == 27:
+                break
+            cv2.imshow('object_detector', image)
         
 
-        #cap.release()
-        #cv2.destroyAllWindows()
+        cap.release()
+        cv2.destroyAllWindows()
              
 
 def parse():
@@ -127,6 +127,8 @@ def parse():
         required=False,
         default=False)
     args = parser.parse_args()
-    return args
+    
     #detector = AmbulanceDetection(args)
-    #detector.run()    
+    #detector.run()
+    
+#main()
