@@ -22,9 +22,6 @@ from tflite_support.task import processor
 from tflite_support.task import vision
 import utils
 
-from flask import Flask, render_template, Response
-app = Flask(__name__)
-
 
 
 def run(model: str, camera_id: int, width: int, height: int, num_threads: int,
@@ -101,18 +98,17 @@ def run(model: str, camera_id: int, width: int, height: int, num_threads: int,
     cv2.putText(image, fps_text, text_location, cv2.FONT_HERSHEY_PLAIN,
                 font_size, text_color, font_thickness)
 
-    # Stop the program if the ESC key is pressed.
-    #if cv2.waitKey(1) == 27:
-    #  break
-    #cv2.imshow('object_detector', image)
-    yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + image + b'\r\n')  # concat frame one by one and show result
+    #Stop the program if the ESC key is pressed.
+    if cv2.waitKey(1) == 27:
+      break
+    cv2.imshow('object_detector', image)
+   
 
   cap.release()
   cv2.destroyAllWindows()
 
 
-def detect():
+def main():
   parser = argparse.ArgumentParser(
       formatter_class=argparse.ArgumentDefaultsHelpFormatter)
   parser.add_argument(
@@ -151,20 +147,7 @@ def detect():
   run(args.model, int(args.cameraId), args.frameWidth, args.frameHeight,
       int(args.numThreads), bool(args.enableEdgeTPU))
 
-
-@app.route('/video_feed')
-def video_feed():
-    #Video streaming route. Put this in the src attribute of an img tag
-    return Response(detect(), mimetype='multipart/x-mixed-replace; boundary=frame')
-
-
-@app.route('/')
-def index():
-    """Video streaming home page."""
-    return render_template('index.html')
-
-
     
 
 if __name__ == '__main__':
- app.run(host='0.0.0.0',debug=False)
+    main()
