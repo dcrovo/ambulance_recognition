@@ -49,7 +49,7 @@ class AmbulanceDetection():
 
         # Initialize the object detection model
         base_options = core.BaseOptions(
-            file_name=self.model, use_coral=self.enable_edgetpu, num_threads=self.num_threads)
+            file_name=self.model, use_coral=self.enableEdgeTPU, num_threads=self.numThreads)
         detection_options = processor.DetectionOptions(
             max_results=3, score_threshold=0.3)
         options = vision.ObjectDetectorOptions(
