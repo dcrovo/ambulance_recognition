@@ -108,7 +108,7 @@ def run(detector):
 		with lock:
 			outputFrame = image.copy()
 			cv2.imwrite('Test.jpg', image)
-			print(outputFrame)
+			
 
 
 @app.route("/")

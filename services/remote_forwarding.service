@@ -1,0 +1,14 @@
+***Service to star remote port forwarding to enable internet visualization ***
+[Unit]
+Description=Remote port forwarding to Azure Virtual Machine
+After=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=/home/camera/ambulance_recognition/scripts/remote_forwarding.sh
+User=pi
+WorkingDirectory=/home/pi/ambulance_recognition/scripts
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

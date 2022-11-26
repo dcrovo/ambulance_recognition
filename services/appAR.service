@@ -1,0 +1,16 @@
+[Unit]
+Description=Main app ambulance recognitiong starting service
+After=multi-user.target systemd-networkd-wait-online.service
+
+[Service]
+Type=simple
+ExecStart=/home/camera/ambulance_recognition/app/src/main.py
+User=pi
+RemainAfterExit=yes
+WorkingDirectory=/home/camera/ambulance_recognition/app/src
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
+
