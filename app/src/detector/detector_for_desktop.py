@@ -1,12 +1,15 @@
+#!/home/camera/tflite/bin/python
 import argparse
 import sys
 import time
-
+from datetime import datetime
+import csv
 import cv2
 from tflite_support.task import core
 from tflite_support.task import processor
 from tflite_support.task import vision
 import utils
+import os
 
 
 class AmbulanceDetection():
@@ -54,7 +57,17 @@ class AmbulanceDetection():
                 sys.exit(
                 'ERROR: Unable to read from webcam. Please verify your webcam settings.'
             )
-
+            rpath_data=os.path.abspath(os.path.join(os.getcwd(),"../../data"))
+            date = datetime.now()
+            file_name = os.path.join(rpath_data,date.strftime('%d-%m-%Y')+"_detections.csv")
+            try:
+                with open(file_name, 'x', newline='') as out_file:
+                    writer = csv.writer(out_file)
+                    writer.writerow(["Category","Probability","Timestamp"])
+                    
+            except:
+                pass
+                
             counter += 1
             image = cv2.flip(image, 1)
 
@@ -68,7 +81,7 @@ class AmbulanceDetection():
             detection_result = detector.detect(input_tensor)
             self.detections = detection_result.detections
             # Draw keypoints and edges on input image
-            image = utils.visualize(image, detection_result)
+            image, ambulanceDetected = utils.visualize(image, detection_result, file_name)
 
             # Calculate the FPS
             if counter % fps_avg_frame_count == 0:
@@ -87,8 +100,50 @@ class AmbulanceDetection():
             if cv2.waitKey(1) == 27:
                 break
             cv2.imshow('object_detector', image)
+            print(ambulanceDetected)
            
 
         cap.release()
         cv2.destroyAllWindows()
             
+def parse():
+            
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument(
+        '--model',
+        help='Path of the object detection model.',
+        required=False,
+        default='efficientdet_lite0.tflite')
+    parser.add_argument(
+        '--cameraId', help='Id of camera.', required=False, type=int, default=0)
+    parser.add_argument(
+        '--frameWidth',
+        help='Width of frame to capture from camera.',
+        required=False,
+        type=int,
+        default=640)
+    parser.add_argument(
+        '--frameHeight',
+        help='Height of frame to capture from camera.',
+        required=False,
+        type=int,
+        default=480)
+    parser.add_argument(
+        '--numThreads',
+        help='Number of CPU threads to run the model.',
+        required=False,
+        type=int,
+        default=4)
+    parser.add_argument(
+        '--enableEdgeTPU',
+        help='Whether to run the model on EdgeTPU.',
+        action='store_true',
+        required=False,
+        default=False)
+    args = parser.parse_args()
+    return args
+
+args=parse()
+detector=AmbulanceDetection(args)
+detector.run()

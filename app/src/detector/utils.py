@@ -59,7 +59,7 @@ def visualize(
     cv2.putText(image, result_text, text_location, cv2.FONT_HERSHEY_PLAIN,
                 _FONT_SIZE, _TEXT_COLOR, _FONT_THICKNESS)
                 
-    if(category_name=='person'):
+    if(category_name=='truck'):
         ambulanceDetected = True
     else:
         ambulanceDetected = False

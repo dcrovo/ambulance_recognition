@@ -7,9 +7,10 @@ from flask import Flask
 from flask import render_template, send_file
 import threading
 import argparse
-import datetime
+from datetime import datetime
 import time
 import cv2
+import os
 
 from tflite_support.task import core
 from tflite_support.task import processor
@@ -63,14 +64,14 @@ app = Flask(__name__)
 
 def run(detector):
 	# Variables to calculate FPS
-	counter, fps = 0, 0
+	ambulance_detections_counter, counter, fps = 0, 0, 0
 	start_time = time.time()
+	ambulance = False
 	global lock, outputFrame
 	# Start capturing video input from the camera
 	cap = cv2.VideoCapture(detector.cameraId)
 	cap.set(cv2.CAP_PROP_FRAME_WIDTH, detector.frameWidth)
 	cap.set(cv2.CAP_PROP_FRAME_HEIGHT, detector.frameHeigth)
-
 	# Continuously capture images from the camera and run inference
 	while cap.isOpened():
 		success, image = cap.read()
@@ -79,6 +80,19 @@ def run(detector):
 			'ERROR: Unable to read from webcam. Please verify your webcam settings.'
 		)
 
+		rpath_data=os.path.abspath(os.path.join(os.getcwd(),"../data"))
+		rpath_imgs=os.path.abspath(os.path.join(os.getcwd(),"../data/imgs"))
+		date = datetime.now()
+		file_name = os.path.join(rpath_data,date.strftime('%d-%m-%Y')+"_detections.csv")
+		
+		try:
+			with open(file_name, 'x', newline='') as out_file:
+				writer = csv.writer(out_file)
+				writer.writerow(["Category","Probability","Timestamp"])
+				
+		except:
+			pass
+			
 		counter += 1
 		image = cv2.flip(image, 1)
 
@@ -92,7 +106,7 @@ def run(detector):
 		detection_result = detector.detector.detect(input_tensor)
 		detector.detections = detection_result.detections
 		# Draw keypoints and edges on input image
-		image = utils.visualize(image, detection_result)
+		image, ambulanceDetected = utils.visualize(image, detection_result,file_name)
 		
 		# Calculate the FPS
 		if counter % detector.fps_avg_frame_count == 0:
@@ -105,9 +119,28 @@ def run(detector):
 		text_location = (detector.left_margin, detector.row_size)
 		cv2.putText(image, fps_text, text_location, cv2.FONT_HERSHEY_PLAIN,
 					detector.font_size, detector.text_color, detector.font_thickness)
+		if(ambulanceDetected):
+			if(ambulance_detections_counter ==0):
+				count_ref=counter
+			
+			ambulance_detections_counter += 1
+
+			if(ambulance_detections_counter >=5):
+				print(count_ref)
+				print(ambulance_detections_counter)
+				print(counter)
+				if((count_ref + 4) == counter):
+					ambulance=True
+					ambulance_detections_counter =0
+
+				else:
+					ambulance_detections_counter =0
+				
 		with lock:
 			outputFrame = image.copy()
-			cv2.imwrite('Test.jpg', image)
+			if(ambulance):
+				file_name_img = os.path.join(rpath_imgs,date.strftime('%d-%m-%Y-%H-%M-%S')+"_detection.jpg")
+				cv2.imwrite(file_name_img, image)
 			
 
 
