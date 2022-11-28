@@ -7,11 +7,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
-          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-    <link href="tLights.css" rel="stylesheet" type="text/css">
+    <!--link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous"-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='/tLights.css') }}" type="text/css">
     <title>Ambulance Detection - Daniel Crovo</title>
-    <script defer src="tLights.js"></script>
+    <script defer src="{{ url_for('static', filename='/tLights.js') }}"></script>
 </head>
 <body>
 <div class="container">

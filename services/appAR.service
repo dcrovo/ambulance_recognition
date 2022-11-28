@@ -5,7 +5,7 @@ After=multi-user.target systemd-networkd-wait-online.service
 [Service]
 Type=simple
 ExecStart=/home/camera/ambulance_recognition/app/src/main.py
-User=pi
+User=camera
 RemainAfterExit=yes
 WorkingDirectory=/home/camera/ambulance_recognition/app/src
 Restart=on-failure

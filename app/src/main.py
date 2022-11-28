@@ -81,9 +81,11 @@ def run(detector):
 		)
 
 		rpath_data=os.path.abspath(os.path.join(os.getcwd(),"../data"))
+		rpath_amb=os.path.abspath(os.path.join(os.getcwd(),"../ctl"))
 		rpath_imgs=os.path.abspath(os.path.join(os.getcwd(),"../data/imgs"))
 		date = datetime.now()
 		file_name = os.path.join(rpath_data,date.strftime('%d-%m-%Y')+"_detections.csv")
+		amb_flag=os.path.join(rpath_amb,"amb_flag")
 		
 		try:
 			with open(file_name, 'x', newline='') as out_file:
@@ -119,29 +121,33 @@ def run(detector):
 		text_location = (detector.left_margin, detector.row_size)
 		cv2.putText(image, fps_text, text_location, cv2.FONT_HERSHEY_PLAIN,
 					detector.font_size, detector.text_color, detector.font_thickness)
-		if(ambulanceDetected):
-			if(ambulance_detections_counter ==0):
-				count_ref=counter
+		#if(ambulanceDetected):
+		#	if(ambulance_detections_counter ==0):
+		#		count_ref=counter
 			
-			ambulance_detections_counter += 1
+		#	ambulance_detections_counter += 1
 
-			if(ambulance_detections_counter >=5):
-				print(count_ref)
-				print(ambulance_detections_counter)
-				print(counter)
-				if((count_ref + 4) == counter):
-					ambulance=True
-					ambulance_detections_counter =0
+		#	if(ambulance_detections_counter >=5):
+		#		print(count_ref)
+		#		print(ambulance_detection3		print(counter)
+		#		if((count_ref + 4) == counter):
+		#	ambulance=True
+					#ambulance_detections_counter =0
 
-				else:
-					ambulance_detections_counter =0
+				#else:
+					#ambulance_detections_counter =0
 				
 		with lock:
 			outputFrame = image.copy()
-			if(ambulance):
+			if(ambulanceDetected):
 				file_name_img = os.path.join(rpath_imgs,date.strftime('%d-%m-%Y-%H-%M-%S')+"_detection.jpg")
 				cv2.imwrite(file_name_img, image)
-			
+				with open(amb_flag, 'w') as out_file:
+					out_file.write("1")
+			else:
+				with open(amb_flag, 'w') as out_file:
+					out_file.write("0")
+							
 
 
 @app.route("/")

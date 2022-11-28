@@ -1,14 +1,15 @@
-***Service to star remote port forwarding to enable internet visualization ***
 [Unit]
 Description=Remote port forwarding to Azure Virtual Machine
-After=multi-user.target
+After=multi-user.target systemd-networkd-wait-online.service
 
 [Service]
 Type=simple
 ExecStart=/home/camera/ambulance_recognition/scripts/remote_forwarding.sh
 User=pi
-WorkingDirectory=/home/pi/ambulance_recognition/scripts
+RemainAfterExit=yes
+WorkingDirectory=/home/camera/ambulance_recognition/scripts
 Restart=on-failure
+RestartSec=5s
 
 [Install]
 WantedBy=multi-user.target
